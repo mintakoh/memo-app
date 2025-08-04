@@ -1,12 +1,20 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import {
   Memo,
   MemoFormData,
   MEMO_CATEGORIES,
   DEFAULT_CATEGORIES,
+  EditMode,
 } from '@/types/memo'
+
+// MDEditor를 동적으로 임포트 (SSR 이슈 방지)
+const MDEditor = dynamic(
+  () => import('@uiw/react-md-editor').then((mod) => mod.default),
+  { ssr: false }
+)
 
 interface MemoFormProps {
   isOpen: boolean
@@ -28,6 +36,7 @@ export default function MemoForm({
     tags: [],
   })
   const [tagInput, setTagInput] = useState('')
+  const [editMode, setEditMode] = useState<EditMode>('text')
 
   // 편집 모드일 때 폼 데이터 설정
   useEffect(() => {
@@ -47,6 +56,7 @@ export default function MemoForm({
       })
     }
     setTagInput('')
+    setEditMode('text') // 폼 초기화 시 텍스트 모드로 설정
   }, [editingMemo, isOpen])
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -170,26 +180,80 @@ export default function MemoForm({
 
             {/* 내용 */}
             <div>
-              <label
-                htmlFor="content"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                내용 *
-              </label>
-              <textarea
-                id="content"
-                value={formData.content}
-                onChange={e =>
-                  setFormData(prev => ({
-                    ...prev,
-                    content: e.target.value,
-                  }))
-                }
-                className="placeholder-gray-400 text-gray-400 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
-                placeholder="메모 내용을 입력하세요"
-                rows={8}
-                required
-              />
+              <div className="flex items-center justify-between mb-2">
+                <label
+                  htmlFor="content"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  내용 * {editMode === 'markdown' && '(마크다운 지원)'}
+                </label>
+                {/* 편집 모드 토글 버튼 */}
+                <div className="flex bg-gray-100 rounded-lg p-1">
+                  <button
+                    type="button"
+                    onClick={() => setEditMode('text')}
+                    className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                      editMode === 'text'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    일반 텍스트
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditMode('markdown')}
+                    className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                      editMode === 'markdown'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    마크다운
+                  </button>
+                </div>
+              </div>
+
+              {editMode === 'text' ? (
+                <textarea
+                  id="content"
+                  value={formData.content}
+                  onChange={e =>
+                    setFormData(prev => ({
+                      ...prev,
+                      content: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                  placeholder="내용을 입력하세요..."
+                  rows={16}
+                  required
+                />
+              ) : (
+                <div className="border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-colors">
+                  <MDEditor
+                    value={formData.content}
+                    onChange={(value) =>
+                      setFormData(prev => ({
+                        ...prev,
+                        content: value || '',
+                      }))
+                    }
+                    preview="live"
+                    hideToolbar={false}
+                    textareaProps={{
+                      placeholder: '메모 내용을 마크다운으로 입력하세요...',
+                      style: {
+                        fontSize: 14,
+                        lineHeight: 1.5,
+                        fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
+                      },
+                    }}
+                    height={400}
+                    data-color-mode="light"
+                  />
+                </div>
+              )}
             </div>
 
             {/* 태그 */}

@@ -8,11 +8,14 @@ export interface Memo {
   updatedAt: string
 }
 
+export type EditMode = 'text' | 'markdown'
+
 export interface MemoFormData {
   title: string
   content: string
   category: string
   tags: string[]
+  editMode?: EditMode
 }
 
 export type MemoCategory = 'personal' | 'work' | 'study' | 'idea' | 'other'
