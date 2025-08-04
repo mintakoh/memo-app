@@ -62,6 +62,48 @@ export const sampleMemos: Memo[] = [
     createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(), // 20일 전
     updatedAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(), // 12일 전
   },
+  {
+    id: '7',
+    title: '마크다운 리스트 테스트',
+    content: `# 마크다운 리스트 테스트
+
+## 순서 없는 리스트
+- 첫 번째 항목
+- 두 번째 항목
+  - 중첩 항목 1
+  - 중첩 항목 2
+    - 깊은 중첩 항목
+- 세 번째 항목
+
+## 순서 있는 리스트
+1. 첫 번째 단계
+2. 두 번째 단계
+   1. 세부 단계 A
+   2. 세부 단계 B
+      1. 더 세부적인 단계
+      2. 또 다른 세부 단계
+3. 세 번째 단계
+
+## 혼합 리스트
+1. 주요 작업
+   - 서브 작업 A
+   - 서브 작업 B
+     1. 세부 계획 1
+     2. 세부 계획 2
+2. 다음 주요 작업
+   * 다른 스타일 리스트
+   + 또 다른 스타일
+
+## 체크리스트
+- [x] 완료된 작업
+- [ ] 미완료 작업
+- [x] 또 다른 완료된 작업
+- [ ] 진행중인 작업`,
+    category: 'other',
+    tags: ['마크다운', '테스트', '리스트'],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
 ]
 
 export const seedSampleData = () => {

@@ -6,9 +6,10 @@ interface MemoItemProps {
   memo: Memo
   onEdit: (memo: Memo) => void
   onDelete: (id: string) => void
+  onView: (memo: Memo) => void
 }
 
-export default function MemoItem({ memo, onEdit, onDelete }: MemoItemProps) {
+export default function MemoItem({ memo, onEdit, onDelete, onView }: MemoItemProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('ko-KR', {
@@ -31,8 +32,19 @@ export default function MemoItem({ memo, onEdit, onDelete }: MemoItemProps) {
     return colors[category as keyof typeof colors] || colors.other
   }
 
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // 액션 버튼이 클릭된 경우 상세 보기를 열지 않음
+    if ((e.target as HTMLElement).closest('button')) {
+      return
+    }
+    onView(memo)
+  }
+
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
+    <div 
+      className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200 cursor-pointer" 
+      onClick={handleCardClick}
+    >
       {/* 헤더 */}
       <div className="flex justify-between items-start mb-3">
         <div className="flex-1">
